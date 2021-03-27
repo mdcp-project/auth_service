@@ -1,0 +1,39 @@
+version: "3"
+
+services: 
+  db:
+    image: postgres
+    environment: 
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: scrtpsswd
+      POSTGRES_DB: mdcp
+
+  auth:
+    build:
+      context: .
+      dockerfile: auth/Dockerfile
+    environment: 
+      SQLALCHEMY_DATABASE_URL: "postgresql://admin:scrtpsswd@db:5432/mdcp"
+      QUEUE_NAME: "email"
+      RBMQ_ADDRESS: rabbitmq
+    ports: 
+      - "5000:5000"
+    depends_on: 
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: 
+      - "15672:15672"
+
+  # user:
+  #   build: 
+  #     context: .
+  #     dockerfile: user/Dockerfile
+  #   environment: 
+  #     AUTH_URL: auth
+  #     AUTH_PORT: 5000
+  #   depends_on: 
+  #     - auth
+
+    
